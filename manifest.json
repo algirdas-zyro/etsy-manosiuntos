@@ -16,7 +16,7 @@
       "matches": ["https://manosiuntos.post.lt/*", "http://manosiuntos.post.lt/*"]
     }
   ],
-  "permissions": ["tabs", "storage", "activeTab", "scripting", "clipboard"],
+  "permissions": ["tabs", "storage", "activeTab", "scripting"],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
