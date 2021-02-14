@@ -9,15 +9,13 @@ chrome.runtime.onMessage.addListener(({ type, payload }, { tab }, sendResponse) 
     chrome.tabs.query({ currentWindow: true }, (tabs) => {
       const manosiuntosTab = tabs.find(({ url }) => url.includes("https://manosiuntos.post.lt"));
       if (manosiuntosTab) {
-        chrome.tabs.update(manosiuntosTab.id, { active: true, highlighted: true });
-        chrome.runtime.sendMessage({ type: "OPEN_MANOSIUNTOS" });
-      } else {
-        chrome.tabs.create({
-          active: true,
-          url: "https://manosiuntos.post.lt/send/prepare?addNew=true",
-        });
-        chrome.runtime.sendMessage({ type: "CREATE_MANOSIUNTOS" });
+        chrome.tabs.remove(manosiuntosTab.id);
       }
+      chrome.tabs.create({
+        active: true,
+        url: "https://manosiuntos.post.lt/send/prepare?addNew=true",
+      });
+      chrome.runtime.sendMessage({ type: "CREATE_MANOSIUNTOS" });
     });
   }
 });

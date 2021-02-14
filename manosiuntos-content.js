@@ -58,9 +58,9 @@ const stepOneHandler = (sendItemStepOneRef) => {
     setNgInput(weightInputRef, (recipient.quantity * PRODUCT_WEIGHT) / 1000);
     weightObserver.disconnect();
 
-    setTimeout(() => {
-      sendItemStepOneRef.querySelector(".new-parcel-actions a[role='button']").click();
-    }, 0);
+    // setTimeout(() => {
+    //   sendItemStepOneRef.querySelector(".new-parcel-actions a[role='button']").click();
+    // }, 0);
   });
 
   fromPostLabelRef.click();
@@ -114,9 +114,9 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
         setNgInput(emailInputRef, recipient.email);
       }
 
-      setTimeout(() => {
-        sendItemStepTwoRef.querySelector(".new-parcel-actions a[role='button']").click();
-      }, 0);
+      // setTimeout(() => {
+      //   sendItemStepTwoRef.querySelector(".new-parcel-actions a[role='button']").click();
+      // }, 0);
     }, 600);
   }, 200);
 };
@@ -130,47 +130,35 @@ const stepThreeHandler = (sendItemStepThreeRef) => {
 
     thirdPlanRefs[2].querySelector("button.service-select-button").click();
     observer.disconnect();
-    setTimeout(() => {
-      sendItemStepThreeRef.querySelector(".new-parcel-actions a[role='button']").click();
-    }, 0);
+    // setTimeout(() => {
+    //   sendItemStepThreeRef.querySelector(".new-parcel-actions a[role='button']").click();
+    // }, 0);
   });
 
   observer.observe(sendItemStepThreeRef, OBSERVER_DEFAULTS);
 };
 
-const prepareHandler = (appPrepareRef) => {
-  currentRefName = appPrepareRef.localName;
-  const spanRefs = appPrepareRef.querySelectorAll("span");
-  const declarationTriggerRef = [...spanRefs].find(({ textContent }) => textContent === "Pildyti");
+const customsFormHandler = (customsFormRef) => {
+  currentRefName = customsFormRef.localName;
 
-  const appObserver = new MutationObserver(() => {
-    const customsFormRef = document.querySelector("form-cn22");
-    if (!customsFormRef) return;
+  const parcelTypeSelectRef = customsFormRef.querySelector("select[formcontrolname='parcelType']");
+  if (parcelTypeSelectRef && !parcelTypeSelectRef.value) setNgInput(parcelTypeSelectRef, "SELL");
 
-    const parcelTypeSelectRef = customsFormRef.querySelector("select[formcontrolname='parcelType']");
-    if (parcelTypeSelectRef) setNgInput(parcelTypeSelectRef, "SELL");
+  const summaryInputRef = customsFormRef.querySelector("input[formcontrolname='summary']");
+  if (summaryInputRef && !summaryInputRef.value) setNgInput(summaryInputRef, PRODUCT_TITLE);
 
-    const summaryInputRef = customsFormRef.querySelector("input[formcontrolname='summary']");
-    if (summaryInputRef) setNgInput(summaryInputRef, PRODUCT_TITLE);
+  const quantityInputRef = customsFormRef.querySelector("input[formcontrolname='quantity']");
+  if (quantityInputRef && !quantityInputRef.value) setNgInput(quantityInputRef, recipient.quantity);
 
-    const quantityInputRef = customsFormRef.querySelector("input[formcontrolname='quantity']");
-    if (quantityInputRef) setNgInput(quantityInputRef, recipient.quantity);
+  const weightInputRef = customsFormRef.querySelector("input[formcontrolname='weight']");
+  if (weightInputRef && !weightInputRef.value) setNgInput(weightInputRef, recipient.quantity * PRODUCT_WEIGHT);
 
-    const weightInputRef = customsFormRef.querySelector("input[formcontrolname='weight']");
-    if (weightInputRef) setNgInput(weightInputRef, recipient.quantity * PRODUCT_WEIGHT);
+  const amountInputRef = customsFormRef.querySelector("input[formcontrolname='amount']");
+  if (amountInputRef && !amountInputRef.value) setNgInput(amountInputRef, PRODUCT_PRICE);
 
-    const amountInputRef = customsFormRef.querySelector("input[formcontrolname='amount']");
-    if (amountInputRef) setNgInput(amountInputRef, PRODUCT_PRICE);
+  const countrySelectRef = customsFormRef.querySelector("select[formcontrolname='countryId']");
+  if (countrySelectRef && !countrySelectRef.value) setNgInput(countrySelectRef, ORIGIN_COUNTRY_ID);
 
-    const countrySelectRef = customsFormRef.querySelector("select[formcontrolname='countryId']");
-    if (countrySelectRef) setNgInput(countrySelectRef, ORIGIN_COUNTRY_ID);
-
-    // const submitButtonRef = document.querySelector("button[type='submit']");
-    // if (submitButtonRef) submitButtonRef.click();
-  });
-
-  appObserver.observe(document.body, OBSERVER_DEFAULTS);
-  declarationTriggerRef.parentElement.click();
 };
 
 const appObserver = new MutationObserver((mutationsList, observer) => {
@@ -178,27 +166,28 @@ const appObserver = new MutationObserver((mutationsList, observer) => {
   const sendItemStepOneRef = document.querySelector("send-item-step-one");
   const sendItemStepTwoRef = document.querySelector("send-item-step-two");
   const sendItemStepThreeRef = document.querySelector("send-item-step-three");
-  const appPrepareRef = document.querySelector("app-prepare"); // final step/list
+  // const appProductCreate = document.querySelector("app-product-create"); // final step/list
+  const customsFormRef = document.querySelector("form-cn22");
 
-  if (dashboardHomeRef && currentRefName !== dashboardHomeRef.localName) {
+  if (dashboardHomeRef && currentRefName !== dashboardHomeRef?.localName) {
     currentRefName = dashboardHomeRef.localName;
     console.log("enter dashboard -> TODO: redirect to creation of new package?..");
   }
 
-  if (sendItemStepOneRef && currentRefName !== sendItemStepOneRef.localName) {
+  if (sendItemStepOneRef && currentRefName !== sendItemStepOneRef?.localName) {
     stepOneHandler(sendItemStepOneRef);
   }
 
-  if (sendItemStepTwoRef && currentRefName !== sendItemStepTwoRef.localName) {
+  if (sendItemStepTwoRef && currentRefName !== sendItemStepTwoRef?.localName) {
     stepTwoHandler(sendItemStepTwoRef);
   }
 
-  if (sendItemStepThreeRef && currentRefName !== sendItemStepThreeRef.localName) {
+  if (sendItemStepThreeRef && currentRefName !== sendItemStepThreeRef?.localName) {
     stepThreeHandler(sendItemStepThreeRef);
   }
 
-  if (appPrepareRef && currentRefName !== appPrepareRef.localName) {
-    prepareHandler(appPrepareRef);
+  if (customsFormRef && currentRefName !== customsFormRef?.localName) {
+    customsFormHandler(customsFormRef);
   }
 });
 
