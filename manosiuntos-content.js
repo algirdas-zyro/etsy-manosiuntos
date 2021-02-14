@@ -1,11 +1,17 @@
-console.log("manosiuntos contents script working");
+const PRODUCT_WEIGHT = 500; // should come from options
+const PRODUCT_TITLE = "Hot Water Bottle"; // should come from options
+const PRODUCT_PRICE = 25; // should come from options
+const ORIGIN_COUNTRY_ID = 118; // should come from options -- 118 for Lithuania
 
-const WEIGHT = 500; // should come from options
 const OBSERVER_DEFAULTS = { subtree: true, childList: true };
 
 let appRootRef;
 let currentRefName;
 let recipient;
+
+chrome.storage.sync.get("recipient", (result) => {
+  recipient = result.recipient;
+});
 
 // hacks to properly trigger angular input change
 const setNgInput = (inputRef, value, select = false) => {
@@ -33,9 +39,6 @@ const stepOneHandler = (sendItemStepOneRef) => {
   const fromPostLabelRef = sendItemStepOneRef.querySelector("label[for='from-tab-3']");
   const toAddressLabelRef = sendItemStepOneRef.querySelector("label[for='to-tab-1']");
 
-  fromPostLabelRef.click();
-  toAddressLabelRef.click();
-
   const sizeObserver = new MutationObserver(() => {
     const mSizeLabelRef = sendItemStepOneRef.querySelector("label[for='box-s1-sc2-3']");
 
@@ -44,17 +47,24 @@ const stepOneHandler = (sendItemStepOneRef) => {
     mSizeLabelRef.click();
     sizeObserver.disconnect();
 
-    const weightObserver = new MutationObserver(() => {
-      const weightInputRef = sendItemStepOneRef.querySelector(".parcel-additional-options input");
-
-      if (!weightInputRef) return;
-
-      setNgInput(weightInputRef, (recipient.quantity * WEIGHT) / 1000);
-      weightObserver.disconnect();
-    });
-
     weightObserver.observe(sendItemStepOneRef, OBSERVER_DEFAULTS);
   });
+
+  const weightObserver = new MutationObserver(() => {
+    const weightInputRef = sendItemStepOneRef.querySelector(".parcel-additional-options input");
+
+    if (!weightInputRef) return;
+
+    setNgInput(weightInputRef, (recipient.quantity * PRODUCT_WEIGHT) / 1000);
+    weightObserver.disconnect();
+
+    setTimeout(() => {
+      sendItemStepOneRef.querySelector(".new-parcel-actions a[role='button']").click();
+    }, 0);
+  });
+
+  fromPostLabelRef.click();
+  toAddressLabelRef.click();
 
   sizeObserver.observe(sendItemStepOneRef, OBSERVER_DEFAULTS);
 };
@@ -103,6 +113,10 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
       if (recipient.email.length) {
         setNgInput(emailInputRef, recipient.email);
       }
+
+      setTimeout(() => {
+        sendItemStepTwoRef.querySelector(".new-parcel-actions a[role='button']").click();
+      }, 0);
     }, 600);
   }, 200);
 };
@@ -110,11 +124,12 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
 const stepThreeHandler = (sendItemStepThreeRef) => {
   currentRefName = sendItemStepThreeRef.localName;
 
-  const observer = new MutationObserver((mutationsList, observer) => {
+  const observer = new MutationObserver(() => {
     const thirdPlanRefs = sendItemStepThreeRef.querySelectorAll("app-service-plan");
     if (thirdPlanRefs.length === 0) return;
 
     thirdPlanRefs[2].querySelector("button.service-select-button").click();
+    observer.disconnect();
     setTimeout(() => {
       sendItemStepThreeRef.querySelector(".new-parcel-actions a[role='button']").click();
     }, 0);
@@ -123,36 +138,68 @@ const stepThreeHandler = (sendItemStepThreeRef) => {
   observer.observe(sendItemStepThreeRef, OBSERVER_DEFAULTS);
 };
 
-const onLoad = () => {
-  appRootRef = document.querySelector("app-root");
-  chrome.storage.sync.get("recipient", (result) => {
-    recipient = result.recipient;
+const prepareHandler = (appPrepareRef) => {
+  currentRefName = appPrepareRef.localName;
+  const spanRefs = appPrepareRef.querySelectorAll("span");
+  const declarationTriggerRef = [...spanRefs].find(({ textContent }) => textContent === "Pildyti");
+
+  const appObserver = new MutationObserver(() => {
+    const customsFormRef = document.querySelector("form-cn22");
+    if (!customsFormRef) return;
+
+    const parcelTypeSelectRef = customsFormRef.querySelector("select[formcontrolname='parcelType']");
+    if (parcelTypeSelectRef) setNgInput(parcelTypeSelectRef, "SELL");
+
+    const summaryInputRef = customsFormRef.querySelector("input[formcontrolname='summary']");
+    if (summaryInputRef) setNgInput(summaryInputRef, PRODUCT_TITLE);
+
+    const quantityInputRef = customsFormRef.querySelector("input[formcontrolname='quantity']");
+    if (quantityInputRef) setNgInput(quantityInputRef, recipient.quantity);
+
+    const weightInputRef = customsFormRef.querySelector("input[formcontrolname='weight']");
+    if (weightInputRef) setNgInput(weightInputRef, recipient.quantity * PRODUCT_WEIGHT);
+
+    const amountInputRef = customsFormRef.querySelector("input[formcontrolname='amount']");
+    if (amountInputRef) setNgInput(amountInputRef, PRODUCT_PRICE);
+
+    const countrySelectRef = customsFormRef.querySelector("select[formcontrolname='countryId']");
+    if (countrySelectRef) setNgInput(countrySelectRef, ORIGIN_COUNTRY_ID);
+
+    // const submitButtonRef = document.querySelector("button[type='submit']");
+    // if (submitButtonRef) submitButtonRef.click();
   });
-  const observer = new MutationObserver((mutationsList, observer) => {
-    const dashboardHomeRef = document.querySelector("dashboard-home");
-    const sendItemStepOneRef = document.querySelector("send-item-step-one");
-    const sendItemStepTwoRef = document.querySelector("send-item-step-two");
-    const sendItemStepThreeRef = document.querySelector("send-item-step-three");
-    const appPrepare = document.querySelector("app-prepare"); // final step/list
 
-    if (dashboardHomeRef && currentRefName !== dashboardHomeRef.localName) {
-      currentRefName = dashboardHomeRef.localName;
-      console.log("enter dashboard -> TODO: redirect to creation of new package?..");
-    }
-
-    if (sendItemStepOneRef && currentRefName !== sendItemStepOneRef.localName) {
-      stepOneHandler(sendItemStepOneRef);
-    }
-
-    if (sendItemStepTwoRef && currentRefName !== sendItemStepTwoRef.localName) {
-      stepTwoHandler(sendItemStepTwoRef);
-    }
-
-    if (sendItemStepThreeRef && currentRefName !== sendItemStepThreeRef.localName) {
-      stepThreeHandler(sendItemStepThreeRef);
-    }
-  });
-  observer.observe(appRootRef, OBSERVER_DEFAULTS);
+  appObserver.observe(document.body, OBSERVER_DEFAULTS);
+  declarationTriggerRef.parentElement.click();
 };
 
-window.addEventListener("load", onLoad);
+const appObserver = new MutationObserver((mutationsList, observer) => {
+  const dashboardHomeRef = document.querySelector("dashboard-home");
+  const sendItemStepOneRef = document.querySelector("send-item-step-one");
+  const sendItemStepTwoRef = document.querySelector("send-item-step-two");
+  const sendItemStepThreeRef = document.querySelector("send-item-step-three");
+  const appPrepareRef = document.querySelector("app-prepare"); // final step/list
+
+  if (dashboardHomeRef && currentRefName !== dashboardHomeRef.localName) {
+    currentRefName = dashboardHomeRef.localName;
+    console.log("enter dashboard -> TODO: redirect to creation of new package?..");
+  }
+
+  if (sendItemStepOneRef && currentRefName !== sendItemStepOneRef.localName) {
+    stepOneHandler(sendItemStepOneRef);
+  }
+
+  if (sendItemStepTwoRef && currentRefName !== sendItemStepTwoRef.localName) {
+    stepTwoHandler(sendItemStepTwoRef);
+  }
+
+  if (sendItemStepThreeRef && currentRefName !== sendItemStepThreeRef.localName) {
+    stepThreeHandler(sendItemStepThreeRef);
+  }
+
+  if (appPrepareRef && currentRefName !== appPrepareRef.localName) {
+    prepareHandler(appPrepareRef);
+  }
+});
+
+window.addEventListener("load", () => appObserver.observe(document.querySelector("app-root"), OBSERVER_DEFAULTS));
