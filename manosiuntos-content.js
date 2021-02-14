@@ -42,7 +42,7 @@ const stepOneHandler = (sendItemStepOneRef) => {
     if (!mSizeLabelRef) return;
 
     mSizeLabelRef.click();
-    sizeObserver.destroy();
+    sizeObserver.disconnect();
 
     const weightObserver = new MutationObserver(() => {
       const weightInputRef = sendItemStepOneRef.querySelector(".parcel-additional-options input");
@@ -50,7 +50,7 @@ const stepOneHandler = (sendItemStepOneRef) => {
       if (!weightInputRef) return;
 
       setNgInput(weightInputRef, (recipient.quantity * WEIGHT) / 1000);
-      weightObserver.destroy();
+      weightObserver.disconnect();
     });
 
     weightObserver.observe(sendItemStepOneRef, OBSERVER_DEFAULTS);
@@ -61,7 +61,6 @@ const stepOneHandler = (sendItemStepOneRef) => {
 
 const stepTwoHandler = (sendItemStepTwoRef) => {
   currentRefName = sendItemStepTwoRef.localName;
-
   const country = getCountry(recipient.country);
   const enterKeyboardEvent = new KeyboardEvent("keydown", {
     code: "Enter",
@@ -138,7 +137,7 @@ const onLoad = () => {
 
     if (dashboardHomeRef && currentRefName !== dashboardHomeRef.localName) {
       currentRefName = dashboardHomeRef.localName;
-      console.log("enter dashboard");
+      console.log("enter dashboard -> TODO: redirect to creation of new package?..");
     }
 
     if (sendItemStepOneRef && currentRefName !== sendItemStepOneRef.localName) {
