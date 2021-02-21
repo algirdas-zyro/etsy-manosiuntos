@@ -6,11 +6,17 @@ const ORIGIN_COUNTRY_ID = 118; // should come from options -- 118 for Lithuania
 const OBSERVER_DEFAULTS = { subtree: true, childList: true };
 
 let appRootRef;
+let newParcelModalRef;
 let currentRefName;
 let recipient;
 
 chrome.storage.sync.get("recipient", (result) => {
   recipient = result.recipient;
+});
+
+const scrollToNextButton = () => newParcelModalRef.scrollTo({
+  top: 9999, // try to scroll to the very bottom where the 'next' button is
+  behavior: 'smooth'
 });
 
 // hacks to properly trigger angular input change
@@ -38,6 +44,7 @@ const getCountry = (countryString) => {
 
 const stepOneHandler = (sendItemStepOneRef) => {
   currentRefName = sendItemStepOneRef.localName;
+  console.log(newParcelModalRef);
 
   const fromPostLabelRef = sendItemStepOneRef.querySelector("label[for='from-tab-3']");
   const toAddressLabelRef = sendItemStepOneRef.querySelector("label[for='to-tab-1']");
@@ -50,9 +57,7 @@ const stepOneHandler = (sendItemStepOneRef) => {
     setNgInput(weightInputRef, (recipient.quantity * PRODUCT_WEIGHT) / 1000);
     weightObserver.disconnect();
 
-    // setTimeout(() => {
-    //   sendItemStepOneRef.querySelector(".new-parcel-actions a[role='button']").click();
-    // }, 0);
+    scrollToNextButton();
   });
 
   const sizeObserver = new MutationObserver(() => {
@@ -117,9 +122,8 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
         setNgInput(emailInputRef, recipient.email);
       }
 
-      // setTimeout(() => {
-      //   sendItemStepTwoRef.querySelector(".new-parcel-actions a[role='button']").click();
-      // }, 0);
+      scrollToNextButton();
+
     }, 800);
   }, 400);
 };
@@ -133,9 +137,8 @@ const stepThreeHandler = (sendItemStepThreeRef) => {
 
     thirdPlanRefs[2].querySelector("button.service-select-button").click();
     observer.disconnect();
-    // setTimeout(() => {
-    //   sendItemStepThreeRef.querySelector(".new-parcel-actions a[role='button']").click();
-    // }, 0);
+
+    scrollToNextButton();
   });
 
   observer.observe(sendItemStepThreeRef, OBSERVER_DEFAULTS);
@@ -169,13 +172,9 @@ const appObserver = new MutationObserver((mutationsList, observer) => {
   const sendItemStepOneRef = document.querySelector("send-item-step-one");
   const sendItemStepTwoRef = document.querySelector("send-item-step-two");
   const sendItemStepThreeRef = document.querySelector("send-item-step-three");
-  // const appProductCreate = document.querySelector("app-product-create"); // final step/list
   const customsFormRef = document.querySelector("form-cn22");
 
-  if (dashboardHomeRef && currentRefName !== dashboardHomeRef?.localName) {
-    currentRefName = dashboardHomeRef.localName;
-    console.log("enter dashboard -> TODO: redirect to creation of new package?..");
-  }
+  if (!newParcelModalRef) newParcelModalRef = document.querySelector(".ng-modal-new-parcel");
 
   if (sendItemStepOneRef && currentRefName !== sendItemStepOneRef?.localName) {
     stepOneHandler(sendItemStepOneRef);
@@ -194,4 +193,7 @@ const appObserver = new MutationObserver((mutationsList, observer) => {
   }
 });
 
-window.addEventListener("load", () => appObserver.observe(document.querySelector("app-root"), OBSERVER_DEFAULTS));
+window.addEventListener("load", () => {
+  appObserver.observe(document.querySelector("app-root"), OBSERVER_DEFAULTS);
+  newParcelModalRef = document.querySelector(".ng-modal-new-parcel");
+});
