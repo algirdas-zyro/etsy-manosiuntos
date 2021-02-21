@@ -1,5 +1,3 @@
-console.log("background worker ir running");
-
 chrome.runtime.onMessage.addListener(({ type, payload }, { tab }, sendResponse) => {
   if (type === "SET_RECIPIENT") {
     chrome.tabs.query({ currentWindow: true }, (tabs) => {

@@ -1,5 +1,3 @@
-console.log("ETSY content script working");
-
 let rows = [];
 
 window.addEventListener("load", () => {

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "svelte-tailwind-extension-boilerplate",
+  "name": "etsy-manosiuntos-extension",
   "version": "0.0.1",
   "description": "A browser extension template built with Svelte and TailwindCSS",
   "keywords": [
