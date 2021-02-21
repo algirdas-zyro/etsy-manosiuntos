@@ -1,3 +1,4 @@
+import postIcon from '../images/post.svg';
 let rows = [];
 
 window.addEventListener("load", () => {
@@ -17,8 +18,11 @@ window.addEventListener("load", () => {
       if (!flagImgRightRef) return;
 
       const deliveryToggleRef = row.querySelector("[data-content-toggle]");
-      const buttonRef = document.createElement("button");
-      buttonRef.innerHTML = "post";
+      const buttonRef = document.createElement("div");
+      buttonRef.style.cursor = 'pointer';
+      buttonRef.style.height = '14px';
+      buttonRef.style.textAlign = 'center';
+      buttonRef.innerHTML = postIcon;
 
       flagImgRightRef.appendChild(buttonRef);
 
@@ -56,7 +60,3 @@ window.addEventListener("load", () => {
   // Start observing the target node for configured mutations
   observer.observe(ordersPage, { subtree: true, childList: true });
 });
-
-// chrome.storage.sync.get({ count: 0 }, ({ count }) => {
-//   console.log(count);
-// });

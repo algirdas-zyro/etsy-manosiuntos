@@ -9,6 +9,7 @@ import {
   simpleReloader,
 } from "rollup-plugin-chrome-extension";
 import { emptyDir } from "rollup-plugin-empty-dir";
+import svg from 'rollup-plugin-svg'
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -33,6 +34,7 @@ export default {
     resolve({
       dedupe: ["svelte"],
     }),
+    svg(),
     // https://github.com/rollup/plugins/tree/master/packages/commonjs
     commonjs(),
     // Empties the output dir before a new build
