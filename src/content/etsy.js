@@ -1,4 +1,4 @@
-import postIcon from '../images/post.svg';
+import postIcon from "../images/post.svg";
 let rows = [];
 
 window.addEventListener("load", () => {
@@ -19,9 +19,9 @@ window.addEventListener("load", () => {
 
       const deliveryToggleRef = row.querySelector("[data-content-toggle]");
       const buttonRef = document.createElement("div");
-      buttonRef.style.cursor = 'pointer';
-      buttonRef.style.height = '14px';
-      buttonRef.style.textAlign = 'center';
+      buttonRef.style.cursor = "pointer";
+      buttonRef.style.height = "14px";
+      buttonRef.style.textAlign = "center";
       buttonRef.innerHTML = postIcon;
 
       flagImgRightRef.appendChild(buttonRef);
@@ -33,11 +33,19 @@ window.addEventListener("load", () => {
         deliveryToggleRef.click();
 
         setTimeout(() => {
+          const rawName = row.querySelector(".address .name")?.textContent ?? "";
+          const name = rawName
+            .split(" ")
+            .map((word) => {
+              const [firstLetter, ...otherLetters] = word.split("");
+              return `${firstLetter?.toUpperCase()}${otherLetters.join("")}`;
+            })
+            .join(" ");
           chrome.storage.sync.set(
             {
               recipient: {
+                name,
                 email: row.querySelector("[href^='mailto:']")?.textContent ?? "",
-                name: row.querySelector(".address .name")?.textContent ?? "",
                 firstLine: row.querySelector(".address .first-line")?.textContent ?? "",
                 secondLine: row.querySelector(".address .second-line")?.textContent ?? "",
                 city: row.querySelector(".address .city")?.textContent ?? "",

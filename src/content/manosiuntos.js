@@ -14,10 +14,11 @@ chrome.storage.sync.get("recipient", (result) => {
   recipient = result.recipient;
 });
 
-const scrollToNextButton = () => newParcelModalRef.scrollTo({
-  top: 9999, // try to scroll to the very bottom where the 'next' button is
-  behavior: 'smooth'
-});
+const scrollToNextButton = () =>
+  newParcelModalRef.scrollTo({
+    top: 9999, // try to scroll to the very bottom where the 'next' button is
+    behavior: "smooth",
+  });
 
 // hacks to properly trigger angular input change
 const setNgInput = (inputRef, value, select = false) => {
@@ -44,7 +45,6 @@ const getCountry = (countryString) => {
 
 const stepOneHandler = (sendItemStepOneRef) => {
   currentRefName = sendItemStepOneRef.localName;
-  console.log(newParcelModalRef);
 
   const fromPostLabelRef = sendItemStepOneRef.querySelector("label[for='from-tab-3']");
   const toAddressLabelRef = sendItemStepOneRef.querySelector("label[for='to-tab-1']");
@@ -79,6 +79,7 @@ const stepOneHandler = (sendItemStepOneRef) => {
 
 const stepTwoHandler = (sendItemStepTwoRef) => {
   currentRefName = sendItemStepTwoRef.localName;
+
   const country = getCountry(recipient.country);
   const enterKeyboardEvent = new KeyboardEvent("keydown", {
     code: "Enter",
@@ -111,8 +112,9 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
       setNgInput(firstLineInputRef, recipient.firstLine);
 
       const secondLineInputRef = sendItemStepTwoRef.querySelector("input[formcontrolname='address2']");
-      // TODO: parse and add state here:
-      setNgInput(secondLineInputRef, recipient.secondLine);
+      const { secondLine, state } = recipient;
+      const secondLineValue = secondLine ? `${secondLine}, ${state}` : state;
+      setNgInput(secondLineInputRef, secondLineValue);
 
       const zipInputRef = sendItemStepTwoRef.querySelector("input[formcontrolname='postalCode']");
       setNgInput(zipInputRef, recipient.zip);
@@ -123,9 +125,8 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
       }
 
       scrollToNextButton();
-
-    }, 800);
-  }, 400);
+    }, 1500);
+  }, 500);
 };
 
 const stepThreeHandler = (sendItemStepThreeRef) => {
@@ -160,15 +161,13 @@ const customsFormHandler = (customsFormRef) => {
   if (weightInputRef && !weightInputRef.value) setNgInput(weightInputRef, recipient.quantity * PRODUCT_WEIGHT);
 
   const amountInputRef = customsFormRef.querySelector("input[formcontrolname='amount']");
-  if (amountInputRef && !amountInputRef.value) setNgInput(amountInputRef, PRODUCT_PRICE);
+  if (amountInputRef && !amountInputRef.value) setNgInput(amountInputRef, PRODUCT_PRICE * quantityInputRef.value);
 
   const countrySelectRef = customsFormRef.querySelector("select[formcontrolname='countryId']");
   if (countrySelectRef) setNgInput(countrySelectRef, ORIGIN_COUNTRY_ID);
-
 };
 
 const appObserver = new MutationObserver((mutationsList, observer) => {
-  const dashboardHomeRef = document.querySelector("dashboard-home");
   const sendItemStepOneRef = document.querySelector("send-item-step-one");
   const sendItemStepTwoRef = document.querySelector("send-item-step-two");
   const sendItemStepThreeRef = document.querySelector("send-item-step-three");
