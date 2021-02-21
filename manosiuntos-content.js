@@ -15,6 +15,7 @@ chrome.storage.sync.get("recipient", (result) => {
 
 // hacks to properly trigger angular input change
 const setNgInput = (inputRef, value, select = false) => {
+  if (inputRef == null) return;
   inputRef.value = value;
   inputRef.dispatchEvent(new Event("focus", { bubbles: true }));
   inputRef.dispatchEvent(new Event("input", { bubbles: true }));
@@ -24,8 +25,10 @@ const setNgInput = (inputRef, value, select = false) => {
 
 const getCountry = (countryString) => {
   switch (countryString) {
-    case "United States":
-      return "Jungtinės Amerikos Valstijos";
+    case "United Kingdom":
+      return "Didžioji Britanija";
+    case "Canada":
+      return "Kanada";
     case "Ireland":
       return "Airija";
     default:
@@ -117,8 +120,8 @@ const stepTwoHandler = (sendItemStepTwoRef) => {
       // setTimeout(() => {
       //   sendItemStepTwoRef.querySelector(".new-parcel-actions a[role='button']").click();
       // }, 0);
-    }, 600);
-  }, 200);
+    }, 800);
+  }, 400);
 };
 
 const stepThreeHandler = (sendItemStepThreeRef) => {
