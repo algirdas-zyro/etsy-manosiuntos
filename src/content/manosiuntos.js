@@ -42,17 +42,6 @@ const stepOneHandler = (sendItemStepOneRef) => {
   const fromPostLabelRef = sendItemStepOneRef.querySelector("label[for='from-tab-3']");
   const toAddressLabelRef = sendItemStepOneRef.querySelector("label[for='to-tab-1']");
 
-  const sizeObserver = new MutationObserver(() => {
-    const mSizeLabelRef = sendItemStepOneRef.querySelector("label[for='box-s1-sc2-3']");
-
-    if (!mSizeLabelRef) return;
-
-    mSizeLabelRef.click();
-    sizeObserver.disconnect();
-
-    weightObserver.observe(sendItemStepOneRef, OBSERVER_DEFAULTS);
-  });
-
   const weightObserver = new MutationObserver(() => {
     const weightInputRef = sendItemStepOneRef.querySelector(".parcel-additional-options input");
 
@@ -64,6 +53,17 @@ const stepOneHandler = (sendItemStepOneRef) => {
     // setTimeout(() => {
     //   sendItemStepOneRef.querySelector(".new-parcel-actions a[role='button']").click();
     // }, 0);
+  });
+
+  const sizeObserver = new MutationObserver(() => {
+    const mSizeLabelRef = sendItemStepOneRef.querySelector("label[for='box-s1-sc2-3']");
+
+    if (!mSizeLabelRef) return;
+
+    mSizeLabelRef.click();
+    sizeObserver.disconnect();
+
+    weightObserver.observe(sendItemStepOneRef, OBSERVER_DEFAULTS);
   });
 
   fromPostLabelRef.click();
@@ -145,7 +145,7 @@ const customsFormHandler = (customsFormRef) => {
   currentRefName = customsFormRef.localName;
 
   const parcelTypeSelectRef = customsFormRef.querySelector("select[formcontrolname='parcelType']");
-  if (parcelTypeSelectRef && !parcelTypeSelectRef.value) setNgInput(parcelTypeSelectRef, "SELL");
+  if (parcelTypeSelectRef) setNgInput(parcelTypeSelectRef, "SELL");
 
   const summaryInputRef = customsFormRef.querySelector("input[formcontrolname='summary']");
   if (summaryInputRef && !summaryInputRef.value) setNgInput(summaryInputRef, PRODUCT_TITLE);
@@ -160,7 +160,7 @@ const customsFormHandler = (customsFormRef) => {
   if (amountInputRef && !amountInputRef.value) setNgInput(amountInputRef, PRODUCT_PRICE);
 
   const countrySelectRef = customsFormRef.querySelector("select[formcontrolname='countryId']");
-  if (countrySelectRef && !countrySelectRef.value) setNgInput(countrySelectRef, ORIGIN_COUNTRY_ID);
+  if (countrySelectRef) setNgInput(countrySelectRef, ORIGIN_COUNTRY_ID);
 
 };
 
