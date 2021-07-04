@@ -9,11 +9,16 @@
   "content_scripts": [
     {
       "js": ["content/etsy.js"],
-      "matches": ["https://www.etsy.com/*", "https://etsy.com/*", "http://www.etsy.com/*", "http://etsy.com/*"]
+      "matches": ["https://www.etsy.com/*", "https://etsy.com/*"]
     },
     {
       "js": ["content/manosiuntos.js"],
-      "matches": ["https://manosiuntos.post.lt/*", "http://manosiuntos.post.lt/*"]
+      "matches": [
+        "https://lpexpress.lt/*",
+        "http://lpexpress.lt/*",
+        "https://manosiuntos.post.lt/*",
+        "http://manosiuntos.post.lt/*"
+      ]
     }
   ],
   "permissions": ["tabs", "storage", "activeTab"],
